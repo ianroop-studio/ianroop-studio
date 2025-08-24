@@ -18,8 +18,12 @@ body {
 	font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
 }
 
-p, h1 {
+p {
 	font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
+}
+
+h1 {
+	font-family: 'FoundersGroteskBold', 'Helvetica', 'Arial', sans-serif;
 }
 
 section {
