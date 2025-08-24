@@ -1,12 +1,12 @@
 
 @font-face {
     font-family: 'FoundersGroteskRegular';
-    src: URL('https://fonts/FoundersGroteskWeb-Regular.woff2');
+    src: URL('./fonts/FoundersGroteskWeb-Regular.woff2');
 }
 
 @font-face {
     font-family: 'FoundersGroteskBold';
-    src: URL('https://fonts/FoundersGroteskBoldWeb-Bold.woff2');
+    src: URL('./fonts/FoundersGroteskBoldWeb-Bold.woff2');
 }
 
 body {
