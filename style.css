@@ -64,23 +64,21 @@ li {
 }
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(8, 12em);
+    place-items: center;
+    grid-template-columns: repeat(7, 12em);
     grid-template-rows: repeat(3, 12em);
-    column-gap: 4em;
-    row-gap: 4em;
+    column-gap: 12em;
+    row-gap: 12em;
     background-color: lavender;
     padding: 10%;
     transform-origin: center center;
     will-change: transform;
-    /*transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);*/   
-    transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1); /*easeOutQuart*/
-    /*transition: transform 0.3s cubic-bezier(0.5, 1, 0.89, 1); easeOutQuint*/
-      
+    transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1); /*easeOutQuart*/          
 }
 .grid-item {
     background-color: ivory;
-    height: 12em;
-    width: 12em;
+    height: 16em;
+    width: 16em;
     transition: transform 0.3s ease-in-out;
     cursor: pointer;
 }

@@ -12,6 +12,7 @@
         <ul>
             <a class="studio" href=""><li>Ian Roop Studio</li></a>
             <a class="link" href=""><li>Info</li></a>
+            <a class="link" href=""><li>Photography</li></a>
         </ul>
     </div>
     <div class="pan-container-js" id="panContainer">
@@ -36,10 +37,7 @@
                 <div class="grid-item"></div>
                 <div class="grid-item"></div>
                 <div class="grid-item"></div>
-                <div class="grid-item"></div>
-                <div class="grid-item"></div>
-                <div class="grid-item"></div>
-                <div class="grid-item"></div>                
+                <div class="grid-item"></div>                               
         </div>
     </div>
     <script>
@@ -53,6 +51,17 @@
             var currentY = 0;
             var mouseTrackingX = 0;
             var mouseTrackingY = 0;
+            var targetMouseX = 0;
+            var targetMouseY = 0;
+            var mouseAnimationId = null;
+            var mouseEnteredViewport = false;
+
+            // Trackpad momentum and smoothing
+            var momentumX = 0;
+            var momentumY = 0;
+            var isDecelerating = false;
+            var decelerationFactor = 0.95;
+            var minMomentum = 0.1;
 
             function updateTransform() {
                 var totalX = currentX + mouseTrackingX;
@@ -60,19 +69,7 @@
                 gridContainer.style.transform = 'translate(' + totalX + 'px, ' + totalY + 'px)';
             }
 
-            function handleStart(clientX, clientY) {
-                isDragging = true;
-                startX = clientX - currentX;
-                startY = clientY - currentY;
-                panContainer.style.cursor = 'grabbing';
-            }
-
-            function handleMove(clientX, clientY) {
-                if (!isDragging) return;
-                
-                var newX = clientX - startX;
-                var newY = clientY - startY;
-                
+            function applyConstraints(newX, newY) {
                 // Get container and grid dimensions
                 var containerRect = panContainer.getBoundingClientRect();
                 var gridRect = gridContainer.getBoundingClientRect();
@@ -86,8 +83,68 @@
                 var maxY = (gridRect.height - containerRect.height) / 2 + constraintY;
                 
                 // Apply constraints
-                currentX = Math.max(-maxX, Math.min(maxX, newX));
-                currentY = Math.max(-maxY, Math.min(maxY, newY));
+                return {
+                    x: Math.max(-maxX, Math.min(maxX, newX)),
+                    y: Math.max(-maxY, Math.min(maxY, newY))
+                };
+            }
+
+            // Smooth mouse tracking animation
+            function animateMouseTracking() {
+                var lerpFactor = 0.125; // Adjust for smoothness (0.02 = very smooth, 0.2 = snappy)
+                
+                var deltaX = targetMouseX - mouseTrackingX;
+                var deltaY = targetMouseY - mouseTrackingY;
+                
+                if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1) {
+                    mouseTrackingX += deltaX * lerpFactor;
+                    mouseTrackingY += deltaY * lerpFactor;
+                    
+                    if (!isDragging) {
+                        updateTransform();
+                    }
+                    
+                    mouseAnimationId = requestAnimationFrame(animateMouseTracking);
+                } else {
+                    mouseTrackingX = targetMouseX;
+                    mouseTrackingY = targetMouseY;
+                    if (!isDragging) {
+                        updateTransform();
+                    }
+                    mouseAnimationId = null;
+                }
+            }
+
+            function handleStart(clientX, clientY) {
+                isDragging = true;
+                startX = clientX - currentX;
+                startY = clientY - currentY;
+                panContainer.style.cursor = 'grabbing';
+                
+                // Disable CSS transition during panning
+                gridContainer.style.transition = 'none';
+                
+                // Stop any momentum when starting to drag
+                momentumX = 0;
+                momentumY = 0;
+                isDecelerating = false;
+                
+                // Stop mouse tracking animation during drag
+                if (mouseAnimationId) {
+                    cancelAnimationFrame(mouseAnimationId);
+                    mouseAnimationId = null;
+                }
+            }
+
+            function handleMove(clientX, clientY) {
+                if (!isDragging) return;
+                
+                var newX = clientX - startX;
+                var newY = clientY - startY;
+                
+                var constrained = applyConstraints(newX, newY);
+                currentX = constrained.x;
+                currentY = constrained.y;
                 
                 updateTransform();
             }
@@ -95,6 +152,29 @@
             function handleEnd() {
                 isDragging = false;
                 panContainer.style.cursor = 'grab';
+                
+                // Re-enable CSS transition after panning
+                setTimeout(function() {
+                    gridContainer.style.transition = 'transform 1.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                }, 100);
+            }
+
+            // Momentum animation function
+            function animateMomentum() {
+                if (!isDecelerating || (Math.abs(momentumX) < minMomentum && Math.abs(momentumY) < minMomentum)) {
+                    isDecelerating = false;
+                    return;
+                }
+
+                var constrained = applyConstraints(currentX + momentumX, currentY + momentumY);
+                currentX = constrained.x;
+                currentY = constrained.y;
+                
+                momentumX *= decelerationFactor;
+                momentumY *= decelerationFactor;
+                
+                updateTransform();
+                requestAnimationFrame(animateMomentum);
             }
 
             // Mouse tracking for subtle movement
@@ -110,15 +190,73 @@
                     
                     // Apply 2% movement
                     var maxMovement = Math.min(window.innerWidth, window.innerHeight) * 0.02;
-                    mouseTrackingX = offsetX * maxMovement;
-                    mouseTrackingY = offsetY * maxMovement;
+                    targetMouseX = offsetX * maxMovement;
+                    targetMouseY = offsetY * maxMovement;
                     
-                    updateTransform();
+                    // Start smooth animation if not already running
+                    if (!mouseAnimationId) {
+                        animateMouseTracking();
+                    }
                 } else {
                     // During drag, handle drag movement
                     handleMove(e.clientX, e.clientY);
                 }
             });
+
+            // Handle mouse enter/leave for smoother transitions
+            document.addEventListener('mouseenter', function() {
+                mouseEnteredViewport = true;
+            });
+
+            document.addEventListener('mouseleave', function() {
+                mouseEnteredViewport = false;
+                // Gradually return to center when mouse leaves
+                targetMouseX = 0;
+                targetMouseY = 0;
+                if (!mouseAnimationId && !isDragging) {
+                    animateMouseTracking();
+                }
+            });
+
+            // Trackpad/wheel event handling
+            panContainer.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                
+                // Disable transition during wheel/trackpad panning
+                gridContainer.style.transition = 'none';
+                
+                // Stop any ongoing momentum
+                isDecelerating = false;
+                
+                // Determine if this is a trackpad (smoother, smaller values) or mouse wheel
+                var isTrackpad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) < 50;
+                var sensitivity = isTrackpad ? 1.0 : 0.5;
+                
+                // Apply movement with sensitivity
+                var deltaX = -e.deltaX * sensitivity;
+                var deltaY = -e.deltaY * sensitivity;
+                
+                var constrained = applyConstraints(currentX + deltaX, currentY + deltaY);
+                currentX = constrained.x;
+                currentY = constrained.y;
+                
+                // For trackpad, add momentum for smooth feel
+                if (isTrackpad) {
+                    momentumX = deltaX * 0.3;
+                    momentumY = deltaY * 0.3;
+                    
+                    // Start momentum animation after a short delay
+                    clearTimeout(window.momentumTimeout);
+                    window.momentumTimeout = setTimeout(function() {
+                        if (!isDragging && !isDecelerating) {
+                            isDecelerating = true;
+                            animateMomentum();
+                        }
+                    }, 50);
+                }
+                
+                updateTransform();
+            }, { passive: false });
 
             // Mouse events
             panContainer.addEventListener('mousedown', function(e) {
