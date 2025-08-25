@@ -8,25 +8,151 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <section>
-        <h1>Welcome to my webpage!</h1>
-        <p>This is a basic paragraph.</p>
-        <p>This is a basic paragraph.</p>
-        <p>This is a basic paragraph.</p>
-        <p>This is a basic paragraph.</p>
-        <p>This is a basic paragraph.</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-        <p>Hello World</p>
-    </section>
-    <script src="script.js"></script>
+    <div id="navigation">
+        <ul>
+            <a class="studio" href=""><li>Ian Roop Studio</li></a>
+            <a class="link" href=""><li>Info</li></a>
+        </ul>
+    </div>
+    <div class="pan-container-js" id="panContainer">
+        <div class="grid-container" id="gridContainer">            
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>
+                <div class="grid-item"></div>                
+        </div>
+    </div>
+    <script>
+    (function() {
+            var panContainer = document.getElementById('panContainer');
+            var gridContainer = document.getElementById('gridContainer');
+            var isDragging = false;
+            var startX = 0;
+            var startY = 0;
+            var currentX = 0;
+            var currentY = 0;
+            var mouseTrackingX = 0;
+            var mouseTrackingY = 0;
+
+            function updateTransform() {
+                var totalX = currentX + mouseTrackingX;
+                var totalY = currentY + mouseTrackingY;
+                gridContainer.style.transform = 'translate(' + totalX + 'px, ' + totalY + 'px)';
+            }
+
+            function handleStart(clientX, clientY) {
+                isDragging = true;
+                startX = clientX - currentX;
+                startY = clientY - currentY;
+                panContainer.style.cursor = 'grabbing';
+            }
+
+            function handleMove(clientX, clientY) {
+                if (!isDragging) return;
+                
+                var newX = clientX - startX;
+                var newY = clientY - startY;
+                
+                // Get container and grid dimensions
+                var containerRect = panContainer.getBoundingClientRect();
+                var gridRect = gridContainer.getBoundingClientRect();
+                
+                // Calculate 5% constraint boundaries
+                var constraintX = gridRect.width * 0.05;
+                var constraintY = gridRect.height * 0.05;
+                
+                // Calculate max allowed translation
+                var maxX = (gridRect.width - containerRect.width) / 2 + constraintX;
+                var maxY = (gridRect.height - containerRect.height) / 2 + constraintY;
+                
+                // Apply constraints
+                currentX = Math.max(-maxX, Math.min(maxX, newX));
+                currentY = Math.max(-maxY, Math.min(maxY, newY));
+                
+                updateTransform();
+            }
+
+            function handleEnd() {
+                isDragging = false;
+                panContainer.style.cursor = 'grab';
+            }
+
+            // Mouse tracking for subtle movement
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) {
+                    // Calculate mouse position relative to viewport center
+                    var viewportCenterX = window.innerWidth / 2;
+                    var viewportCenterY = window.innerHeight / 2;
+                    
+                    // Calculate offset from center as percentage
+                    var offsetX = (e.clientX - viewportCenterX) / viewportCenterX;
+                    var offsetY = (e.clientY - viewportCenterY) / viewportCenterY;
+                    
+                    // Apply 2% movement
+                    var maxMovement = Math.min(window.innerWidth, window.innerHeight) * 0.02;
+                    mouseTrackingX = offsetX * maxMovement;
+                    mouseTrackingY = offsetY * maxMovement;
+                    
+                    updateTransform();
+                } else {
+                    // During drag, handle drag movement
+                    handleMove(e.clientX, e.clientY);
+                }
+            });
+
+            // Mouse events
+            panContainer.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                handleStart(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('mouseup', handleEnd);
+
+            // Touch events
+            panContainer.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                var touch = e.touches[0];
+                handleStart(touch.clientX, touch.clientY);
+            });
+
+            document.addEventListener('touchmove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    var touch = e.touches[0];
+                    handleMove(touch.clientX, touch.clientY);
+                }
+            });
+
+            document.addEventListener('touchend', handleEnd);
+
+            // Prevent grid item clicks from triggering drag
+            var gridItems = document.querySelectorAll('.grid-item');
+            for (var i = 0; i < gridItems.length; i++) {
+                gridItems[i].addEventListener('mousedown', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
