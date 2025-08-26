@@ -40,8 +40,237 @@
                 <div class="grid-item"></div>                               
         </div>
     </div>
+
+    <!-- Gallery Overlay -->
+    <div class="gallery-overlay" id="galleryOverlay">
+        <div class="gallery-container">
+            <button class="gallery-close" id="galleryClose">×</button>
+            <button class="gallery-nav gallery-prev" id="galleryPrev">Prev</button>
+            <button class="gallery-nav gallery-next" id="galleryNext">Next</button>
+            <div class="gallery-loading" id="galleryLoading"></div>
+            <img class="gallery-image" id="galleryImage" alt="Gallery Image">
+            <div class="gallery-counter" id="galleryCounter">1 / 21</div>            
+        </div>
+    </div>
     <script>
     (function() {
+        // Gallery System
+        var Gallery = {
+            overlay: null,
+            image: null,
+            loading: null,
+            counter: null,
+            currentIndex: 0,
+            totalItems: 0,
+            gridItems: [],
+            
+            // Sample image URLs - replace with your actual images
+            imageUrls: [
+                'https://picsum.photos/1200/800?random=1',
+                'https://picsum.photos/1200/800?random=2',
+                'https://picsum.photos/1200/800?random=3',
+                'https://picsum.photos/1200/800?random=4',
+                'https://picsum.photos/1200/800?random=5',
+                'https://picsum.photos/1200/800?random=6',
+                'https://picsum.photos/1200/800?random=7',
+                'https://picsum.photos/1200/800?random=8',
+                'https://picsum.photos/1200/800?random=9',
+                'https://picsum.photos/1200/800?random=10',
+                'https://picsum.photos/1200/800?random=11',
+                'https://picsum.photos/1200/800?random=12',
+                'https://picsum.photos/1200/800?random=13',
+                'https://picsum.photos/1200/800?random=14',
+                'https://picsum.photos/1200/800?random=15',
+                'https://picsum.photos/1200/800?random=16',
+                'https://picsum.photos/1200/800?random=17',
+                'https://picsum.photos/1200/800?random=18',
+                'https://picsum.photos/1200/800?random=19',
+                'https://picsum.photos/1200/800?random=20',
+                'https://picsum.photos/1200/800?random=21'
+            ],
+            
+            init: function() {
+                console.log('Gallery: Initializing...');
+                this.overlay = document.getElementById('galleryOverlay');
+                this.image = document.getElementById('galleryImage');
+                this.loading = document.getElementById('galleryLoading');
+                this.counter = document.getElementById('galleryCounter');
+                this.gridItems = Array.from(document.querySelectorAll('.grid-item'));
+                this.totalItems = this.gridItems.length;
+                
+                console.log('Gallery: Found', this.totalItems, 'grid items');
+                console.log('Gallery: Overlay element:', this.overlay);
+                
+                if (!this.overlay) {
+                    console.error('Gallery: Overlay element not found!');
+                    return;
+                }
+                
+                this.bindEvents();
+                this.setupGridItems();
+                console.log('Gallery: Initialization complete');
+            },
+            
+            setupGridItems: function() {
+                var self = this;
+                console.log('Gallery: Setting up grid item click handlers');
+                this.gridItems.forEach(function(item, index) {
+                    item.style.cursor = 'pointer';
+                    item.setAttribute('data-gallery-index', index);
+                    
+                    // Use both click and mouseup for better compatibility
+                    item.addEventListener('click', function(e) {
+                        console.log('Gallery: Grid item', index, 'clicked via click event');
+                        e.stopPropagation();
+                        self.open(index);
+                    }, { passive: false });
+                    
+                    item.addEventListener('mouseup', function(e) {
+                        console.log('Gallery: Grid item', index, 'clicked via mouseup event');
+                        e.stopPropagation();
+                        // Only trigger if this wasn't a drag operation
+                        if (Math.abs(e.clientX - (e.target._startX || e.clientX)) < 5 &&
+                            Math.abs(e.clientY - (e.target._startY || e.clientY)) < 5) {
+                            self.open(index);
+                        }
+                    }, { passive: false });
+                    
+                    item.addEventListener('mousedown', function(e) {
+                        e.target._startX = e.clientX;
+                        e.target._startY = e.clientY;
+                    }, { passive: false });
+                });
+            },
+            
+            bindEvents: function() {
+                var self = this;
+                
+                // Close events
+                document.getElementById('galleryClose').addEventListener('click', function() {
+                    self.close();
+                });
+                
+                this.overlay.addEventListener('click', function(e) {
+                    if (e.target === self.overlay) {
+                        self.close();
+                    }
+                });
+                
+                // Navigation
+                document.getElementById('galleryPrev').addEventListener('click', function() {
+                    self.prev();
+                });
+                
+                document.getElementById('galleryNext').addEventListener('click', function() {
+                    self.next();
+                });
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', function(e) {
+                    if (!self.overlay.classList.contains('active')) return;
+                    
+                    switch(e.key) {
+                        case 'Escape':
+                            self.close();
+                            break;
+                        case 'ArrowLeft':
+                            self.prev();
+                            break;
+                        case 'ArrowRight':
+                            self.next();
+                            break;
+                    }
+                });
+            },
+            
+            open: function(index) {
+                console.log('Gallery: Opening gallery at index', index);
+                this.currentIndex = index;
+                
+                if (!this.overlay) {
+                    console.error('Gallery: Cannot open - overlay not found');
+                    return;
+                }
+                
+                // Force show the overlay with inline styles as backup
+                this.overlay.style.display = 'flex';
+                this.overlay.style.opacity = '1';
+                this.overlay.style.visibility = 'visible';
+                
+                this.overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                console.log('Gallery: Overlay should now be visible');
+                this.loadImage();
+            },
+            
+            close: function() {
+                console.log('Gallery: Closing gallery');
+                this.overlay.classList.remove('active');
+                this.overlay.style.display = '';
+                this.overlay.style.opacity = '';
+                this.overlay.style.visibility = '';
+                document.body.style.overflow = '';
+                this.image.classList.remove('loaded');
+            },
+            
+            prev: function() {
+                this.currentIndex = (this.currentIndex - 1 + this.totalItems) % this.totalItems;
+                this.loadImage();
+            },
+            
+            next: function() {
+                this.currentIndex = (this.currentIndex + 1) % this.totalItems;
+                this.loadImage();
+            },
+            
+            loadImage: function() {
+                var self = this;
+                var imageUrl = this.imageUrls[this.currentIndex];
+                
+                console.log('Gallery: Loading image', this.currentIndex + 1, 'of', this.totalItems);
+                
+                // Show loading indicator
+                if (this.loading) {
+                    this.loading.style.display = 'block';
+                }
+                if (this.image) {
+                    this.image.classList.remove('loaded');
+                }
+                
+                // Update counter
+                if (this.counter) {
+                    this.counter.textContent = (this.currentIndex + 1) + ' / ' + this.totalItems;
+                }
+                
+                // Create new image to preload
+                var newImage = new Image();
+                newImage.onload = function() {
+                    console.log('Gallery: Image loaded successfully');
+                    if (self.image) {
+                        self.image.src = imageUrl;
+                        self.image.classList.add('loaded');
+                    }
+                    if (self.loading) {
+                        self.loading.style.display = 'none';
+                    }
+                };
+                newImage.onerror = function() {
+                    console.log('Gallery: Image failed to load, using fallback');
+                    // Fallback for broken images
+                    if (self.image) {
+                        self.image.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+                        self.image.classList.add('loaded');
+                    }
+                    if (self.loading) {
+                        self.loading.style.display = 'none';
+                    }
+                };
+                newImage.src = imageUrl;
+            }
+        };
+        
+        // Existing panning code...
             var panContainer = document.getElementById('panContainer');
             var gridContainer = document.getElementById('gridContainer');
             var isDragging = false;
@@ -91,7 +320,7 @@
 
             // Smooth mouse tracking animation
             function animateMouseTracking() {
-                var lerpFactor = 0.125; // Adjust for smoothness (0.02 = very smooth, 0.2 = snappy)
+                var lerpFactor = 0.08; // Adjust for smoothness (0.02 = very smooth, 0.2 = snappy)
                 
                 var deltaX = targetMouseX - mouseTrackingX;
                 var deltaY = targetMouseY - mouseTrackingY;
@@ -262,9 +491,9 @@
             panContainer.addEventListener('mousedown', function(e) {
                 e.preventDefault();
                 handleStart(e.clientX, e.clientY);
-            });
+            }, { passive: false });
 
-            document.addEventListener('mouseup', handleEnd);
+            document.addEventListener('mouseup', handleEnd, { passive: false });
 
             // Touch events
             panContainer.addEventListener('touchstart', function(e) {
@@ -281,15 +510,19 @@
                 }
             });
 
-            document.addEventListener('touchend', handleEnd);
+            document.addEventListener('touchend', handleEnd, { passive: false });
 
             // Prevent grid item clicks from triggering drag
             var gridItems = document.querySelectorAll('.grid-item');
             for (var i = 0; i < gridItems.length; i++) {
                 gridItems[i].addEventListener('mousedown', function(e) {
                     e.stopPropagation();
-                });
+                }, { passive: false });
             }
+            
+            // Initialize Gallery
+            console.log('Initializing Gallery...');
+            Gallery.init();
         })();
     </script>
 </body>
