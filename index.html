@@ -7,7 +7,7 @@
     <!-- You can link CSS files here -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="body-hidden">
     <div id="navigation">
         <ul>
             <a class="studio" href="index.html"><li>Ian Roop Studio</li></a>
@@ -211,12 +211,14 @@
                 });
                 
                 this.overlay.addEventListener('click', function(e) {
+                    // Only close if clicking on the overlay itself, not the container or its children
                     if (e.target === self.overlay) {
                         self.close();
                     }
                 });
                 
                 this.overlay.addEventListener('touchend', function(e) {
+                    // Only close if touching the overlay itself, not the container or its children
                     if (e.target === self.overlay) {
                         e.preventDefault();
                         self.close();
@@ -264,23 +266,33 @@
                 // Swipe gestures for mobile
                 var swipeStartX = 0;
                 var swipeStartY = 0;
+                var swipeTarget = null;
                 
                 this.overlay.addEventListener('touchstart', function(e) {
-                    if (e.target !== self.overlay && !self.image.contains(e.target)) return;
-                    var touch = e.touches[0];
-                    swipeStartX = touch.clientX;
-                    swipeStartY = touch.clientY;
+                    // Only handle swipes on the image or overlay background
+                    if (e.target === self.overlay || e.target === self.image) {
+                        var touch = e.touches[0];
+                        swipeStartX = touch.clientX;
+                        swipeStartY = touch.clientY;
+                        swipeTarget = e.target;
+                    }
                 }, { passive: true });
                 
                 this.overlay.addEventListener('touchend', function(e) {
-                    if (e.target !== self.overlay && !self.image.contains(e.target)) return;
-                    if (e.changedTouches.length === 0) return;
+                    if (!swipeTarget || e.changedTouches.length === 0) return;
                     
                     var touch = e.changedTouches[0];
                     var deltaX = touch.clientX - swipeStartX;
                     var deltaY = touch.clientY - swipeStartY;
                     
-                    // Only trigger swipe if horizontal movement is greater than vertical
+                    // Close gallery if tapping on overlay background (not swiping)
+                    if (swipeTarget === self.overlay && Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+                        self.close();
+                        swipeTarget = null;
+                        return;
+                    }
+                    
+                    // Only trigger swipe navigation if horizontal movement is greater than vertical
                     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
                         if (deltaX > 0) {
                             self.prev(); // Swipe right = previous
@@ -288,6 +300,8 @@
                             self.next(); // Swipe left = next
                         }
                     }
+                    
+                    swipeTarget = null;
                 }, { passive: true });
             },
             
@@ -637,6 +651,7 @@
         console.log('Initializing Gallery...');
         Gallery.init();
     })();
+    </script>
     </script>
 </body>
 </html>
