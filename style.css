@@ -320,4 +320,25 @@ p a:hover {
         margin-top: 15px;
         max-width: 80%;
     }
+
+    /* Mobile optimizations */
+@media (max-width: 480px) {
+    .gallery-nav {
+        padding: 10px 15px;
+        font-size: 1.2em; 
+        top: 80%;
+        background-color: yellow;        
+    }
+    
+    .gallery-close {
+        font-size: 2em;
+        top: 15px;
+        right: 20px;
+    }
+    
+    .gallery-caption {
+        font-size: 1em;
+        margin-top: 15px;
+        max-width: 60%;
+    }
 }
