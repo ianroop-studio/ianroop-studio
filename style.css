@@ -27,11 +27,32 @@ ul {
     list-style-type: none;
     display: flex;
     justify-content: center;
+    
 }
 
 ul a {
     color: #000000;
     text-decoration: none;
+    position: relative; /* Essential for positioning the pseudo-element */
+    display: inline-block; /* Or block, depending on your layout */   
+    padding-bottom: 5px; /* Adjust as needed to make space for the border */   
+}
+
+ul a::after {
+	content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%; /* Start from the horizontal center */
+    transform: translateX(-50%); /* Center horizontally */
+    height: 2px; /* Thickness of the border */
+    width: 0; /* Initial width (hidden) */
+    background-color: #1A1A1A; /* Color of the border */
+    transition: width 0.3s ease-out; /* Animation for width */
+}
+
+
+ul a:hover::after {
+	width: 80%; /* Expand to full width on hover */
 }
 
 li {
@@ -44,7 +65,23 @@ li {
 
 p {
 	font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
-    font-size: 1.4em;
+    font-size: 1.2em;
+    text-align: left;
+    color: #1A1A1A;
+}
+
+p a {
+	color: #1A1A1A;
+	text-decoration: underline;	
+}
+
+p a:hover {
+	opacity: 0.75;
+}
+
+.caption {
+	font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
+    font-size: 1em;
     text-align: left;
     color: #1A1A1A;
 }
@@ -145,17 +182,32 @@ p {
     opacity: 1;
 }
 
+.gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    padding-left: 16px;
+    font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
+    font-size: 1em;
+    color: #1A1A1A;
+    text-align: left;    
+    max-width: 80%;
+    color: #1A1A1A;
+    z-index: 2001;
+}
+
 .gallery-close {
     position: absolute;
-    top: 20px;
-    right: 30px;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
     font-size: 2.5em;
     color: #1A1A1A;
     cursor: pointer;
     background: none;
     border: none;
-    padding: 10px;
+    padding: 0 10px 10px 10px;
     line-height: 1;
     user-select: none;
     z-index: 2001;
@@ -196,9 +248,11 @@ p {
 
 .gallery-counter {
     position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 0;
+    right: 50%;
+    padding-right: 16px;
+    text-align: right;
+    /*transform: translateX(-50%);*/
     font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
     font-size: 1em;
     color: #1A1A1A;
@@ -223,8 +277,38 @@ p {
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-#info {
+#info-wrapper {
 	width: 100%;
 	margin: 0 auto;
-	padding: 20%;
+	display: flex;
+	align-content: center;
+	padding: 12em 0 4em 0;
+	background-color: #FFFFFF;
+}
+
+#info {
+	width: 50%;
+	margin: 0 auto;
+	display: block;
+	background-color: #FFFFFF;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .gallery-nav {
+        padding: 10px 15px;
+        font-size: 1.2em;
+    }
+    
+    .gallery-close {
+        font-size: 2em;
+        top: 15px;
+        right: 20px;
+    }
+    
+    .gallery-caption {
+        font-size: 1em;
+        margin-top: 15px;
+        max-width: 90%;
+    }
 }

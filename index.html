@@ -49,6 +49,7 @@
             <button class="gallery-nav gallery-next" id="galleryNext">Next</button>
             <div class="gallery-loading" id="galleryLoading"></div>
             <img class="gallery-image" id="galleryImage" alt="Gallery Image">
+            <div class="gallery-caption" id="galleryCaption"></div>
             <div class="gallery-counter" id="galleryCounter">1 / 21</div>            
         </div>
     </div>
@@ -60,11 +61,12 @@
             image: null,
             loading: null,
             counter: null,
+            caption: null,
             currentIndex: 0,
             totalItems: 0,
             gridItems: [],
             
-            // Sample image URLs - replace with your actual images
+            // Sample image URLs and captions - replace with your actual content
             imageUrls: [
                 'https://picsum.photos/1200/800?random=1',
                 'https://picsum.photos/1200/800?random=2',
@@ -89,12 +91,38 @@
                 'https://picsum.photos/1200/800?random=21'
             ],
             
+            // Sample captions - replace with your actual captions
+            captions: [
+                'Landscape photography capturing the golden hour light',
+                'Urban architecture and geometric patterns',
+                'Portrait session with natural lighting',
+                'Abstract composition with dramatic shadows',
+                'Nature photography showcasing organic forms',
+                'Street photography moment frozen in time',
+                'Architectural detail study in black and white',
+                'Environmental portrait in natural setting',
+                'Conceptual photography exploring texture and form',
+                'Documentary photography telling a story',
+                'Fine art photography with minimalist approach',
+                'Commercial photography with creative lighting',
+                'Travel photography capturing cultural moments',
+                'Fashion photography with artistic direction',
+                'Still life composition with careful arrangement',
+                'Experimental photography pushing boundaries',
+                'Wedding photography capturing intimate moments',
+                'Product photography with studio lighting',
+                'Event photography documenting celebrations',
+                'Aerial photography showing new perspectives',
+                'Night photography with long exposure techniques'
+            ],
+            
             init: function() {
                 console.log('Gallery: Initializing...');
                 this.overlay = document.getElementById('galleryOverlay');
                 this.image = document.getElementById('galleryImage');
                 this.loading = document.getElementById('galleryLoading');
                 this.counter = document.getElementById('galleryCounter');
+                this.caption = document.getElementById('galleryCaption');
                 this.gridItems = Array.from(document.querySelectorAll('.grid-item'));
                 this.totalItems = this.gridItems.length;
                 
@@ -118,26 +146,52 @@
                     item.style.cursor = 'pointer';
                     item.setAttribute('data-gallery-index', index);
                     
-                    // Use both click and mouseup for better compatibility
-                    item.addEventListener('click', function(e) {
-                        console.log('Gallery: Grid item', index, 'clicked via click event');
-                        e.stopPropagation();
-                        self.open(index);
-                    }, { passive: false });
+                    // Improved touch handling for mobile
+                    var touchStartX = 0;
+                    var touchStartY = 0;
+                    var touchMoved = false;
                     
-                    item.addEventListener('mouseup', function(e) {
-                        console.log('Gallery: Grid item', index, 'clicked via mouseup event');
+                    // Touch events
+                    item.addEventListener('touchstart', function(e) {
+                        console.log('Gallery: Touch start on item', index);
+                        var touch = e.touches[0];
+                        touchStartX = touch.clientX;
+                        touchStartY = touch.clientY;
+                        touchMoved = false;
+                        // Don't prevent default here to allow panning to still work
+                    }, { passive: true });
+                    
+                    item.addEventListener('touchmove', function(e) {
+                        if (e.touches.length > 0) {
+                            var touch = e.touches[0];
+                            var deltaX = Math.abs(touch.clientX - touchStartX);
+                            var deltaY = Math.abs(touch.clientY - touchStartY);
+                            
+                            // If movement is more than 10px, consider it a pan gesture
+                            if (deltaX > 10 || deltaY > 10) {
+                                touchMoved = true;
+                            }
+                        }
+                    }, { passive: true });
+                    
+                    item.addEventListener('touchend', function(e) {
+                        console.log('Gallery: Touch end on item', index, 'moved:', touchMoved);
+                        e.preventDefault(); // Prevent mouse events from firing
                         e.stopPropagation();
-                        // Only trigger if this wasn't a drag operation
-                        if (Math.abs(e.clientX - (e.target._startX || e.clientX)) < 5 &&
-                            Math.abs(e.clientY - (e.target._startY || e.clientY)) < 5) {
+                        
+                        // Only open gallery if this wasn't a pan gesture
+                        if (!touchMoved) {
+                            console.log('Gallery: Opening gallery from touch');
                             self.open(index);
                         }
                     }, { passive: false });
                     
-                    item.addEventListener('mousedown', function(e) {
-                        e.target._startX = e.clientX;
-                        e.target._startY = e.clientY;
+                    // Keep mouse events for desktop
+                    item.addEventListener('click', function(e) {
+                        console.log('Gallery: Grid item', index, 'clicked via click event');
+                        e.stopPropagation();
+                        e.preventDefault();
+                        self.open(index);
                     }, { passive: false });
                 });
             },
@@ -146,7 +200,13 @@
                 var self = this;
                 
                 // Close events
-                document.getElementById('galleryClose').addEventListener('click', function() {
+                document.getElementById('galleryClose').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    self.close();
+                });
+                
+                document.getElementById('galleryClose').addEventListener('touchend', function(e) {
+                    e.preventDefault();
                     self.close();
                 });
                 
@@ -156,12 +216,31 @@
                     }
                 });
                 
+                this.overlay.addEventListener('touchend', function(e) {
+                    if (e.target === self.overlay) {
+                        e.preventDefault();
+                        self.close();
+                    }
+                });
+                
                 // Navigation
-                document.getElementById('galleryPrev').addEventListener('click', function() {
+                document.getElementById('galleryPrev').addEventListener('click', function(e) {
+                    e.preventDefault();
                     self.prev();
                 });
                 
-                document.getElementById('galleryNext').addEventListener('click', function() {
+                document.getElementById('galleryPrev').addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    self.prev();
+                });
+                
+                document.getElementById('galleryNext').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    self.next();
+                });
+                
+                document.getElementById('galleryNext').addEventListener('touchend', function(e) {
+                    e.preventDefault();
                     self.next();
                 });
                 
@@ -181,6 +260,35 @@
                             break;
                     }
                 });
+                
+                // Swipe gestures for mobile
+                var swipeStartX = 0;
+                var swipeStartY = 0;
+                
+                this.overlay.addEventListener('touchstart', function(e) {
+                    if (e.target !== self.overlay && !self.image.contains(e.target)) return;
+                    var touch = e.touches[0];
+                    swipeStartX = touch.clientX;
+                    swipeStartY = touch.clientY;
+                }, { passive: true });
+                
+                this.overlay.addEventListener('touchend', function(e) {
+                    if (e.target !== self.overlay && !self.image.contains(e.target)) return;
+                    if (e.changedTouches.length === 0) return;
+                    
+                    var touch = e.changedTouches[0];
+                    var deltaX = touch.clientX - swipeStartX;
+                    var deltaY = touch.clientY - swipeStartY;
+                    
+                    // Only trigger swipe if horizontal movement is greater than vertical
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                        if (deltaX > 0) {
+                            self.prev(); // Swipe right = previous
+                        } else {
+                            self.next(); // Swipe left = next
+                        }
+                    }
+                }, { passive: true });
             },
             
             open: function(index) {
@@ -227,6 +335,7 @@
             loadImage: function() {
                 var self = this;
                 var imageUrl = this.imageUrls[this.currentIndex];
+                var imageCaption = this.captions[this.currentIndex] || '';
                 
                 console.log('Gallery: Loading image', this.currentIndex + 1, 'of', this.totalItems);
                 
@@ -241,6 +350,11 @@
                 // Update counter
                 if (this.counter) {
                     this.counter.textContent = (this.currentIndex + 1) + ' / ' + this.totalItems;
+                }
+                
+                // Update caption
+                if (this.caption) {
+                    this.caption.textContent = imageCaption;
                 }
                 
                 // Create new image to preload
@@ -271,259 +385,258 @@
         };
         
         // Existing panning code...
-            var panContainer = document.getElementById('panContainer');
-            var gridContainer = document.getElementById('gridContainer');
-            var isDragging = false;
-            var startX = 0;
-            var startY = 0;
-            var currentX = 0;
-            var currentY = 0;
-            var mouseTrackingX = 0;
-            var mouseTrackingY = 0;
-            var targetMouseX = 0;
-            var targetMouseY = 0;
-            var mouseAnimationId = null;
-            var mouseEnteredViewport = false;
+        var panContainer = document.getElementById('panContainer');
+        var gridContainer = document.getElementById('gridContainer');
+        var isDragging = false;
+        var startX = 0;
+        var startY = 0;
+        var currentX = 0;
+        var currentY = 0;
+        var mouseTrackingX = 0;
+        var mouseTrackingY = 0;
+        var targetMouseX = 0;
+        var targetMouseY = 0;
+        var mouseAnimationId = null;
+        var mouseEnteredViewport = false;
 
-            // Trackpad momentum and smoothing
-            var momentumX = 0;
-            var momentumY = 0;
-            var isDecelerating = false;
-            var decelerationFactor = 0.95;
-            var minMomentum = 0.1;
+        // Trackpad momentum and smoothing
+        var momentumX = 0;
+        var momentumY = 0;
+        var isDecelerating = false;
+        var decelerationFactor = 0.95;
+        var minMomentum = 0.1;
 
-            function updateTransform() {
-                var totalX = currentX + mouseTrackingX;
-                var totalY = currentY + mouseTrackingY;
-                gridContainer.style.transform = 'translate(' + totalX + 'px, ' + totalY + 'px)';
-            }
+        function updateTransform() {
+            var totalX = currentX + mouseTrackingX;
+            var totalY = currentY + mouseTrackingY;
+            gridContainer.style.transform = 'translate(' + totalX + 'px, ' + totalY + 'px)';
+        }
 
-            function applyConstraints(newX, newY) {
-                // Get container and grid dimensions
-                var containerRect = panContainer.getBoundingClientRect();
-                var gridRect = gridContainer.getBoundingClientRect();
-                
-                // Calculate 5% constraint boundaries
-                var constraintX = gridRect.width * 0.05;
-                var constraintY = gridRect.height * 0.05;
-                
-                // Calculate max allowed translation
-                var maxX = (gridRect.width - containerRect.width) / 2 + constraintX;
-                var maxY = (gridRect.height - containerRect.height) / 2 + constraintY;
-                
-                // Apply constraints
-                return {
-                    x: Math.max(-maxX, Math.min(maxX, newX)),
-                    y: Math.max(-maxY, Math.min(maxY, newY))
-                };
-            }
+        function applyConstraints(newX, newY) {
+            // Get container and grid dimensions
+            var containerRect = panContainer.getBoundingClientRect();
+            var gridRect = gridContainer.getBoundingClientRect();
+            
+            // Calculate 5% constraint boundaries
+            var constraintX = gridRect.width * 0.05;
+            var constraintY = gridRect.height * 0.05;
+            
+            // Calculate max allowed translation
+            var maxX = (gridRect.width - containerRect.width) / 2 + constraintX;
+            var maxY = (gridRect.height - containerRect.height) / 2 + constraintY;
+            
+            // Apply constraints
+            return {
+                x: Math.max(-maxX, Math.min(maxX, newX)),
+                y: Math.max(-maxY, Math.min(maxY, newY))
+            };
+        }
 
-            // Smooth mouse tracking animation
-            function animateMouseTracking() {
-                var lerpFactor = 0.08; // Adjust for smoothness (0.02 = very smooth, 0.2 = snappy)
+        // Smooth mouse tracking animation
+        function animateMouseTracking() {
+            var lerpFactor = 0.08;
+            
+            var deltaX = targetMouseX - mouseTrackingX;
+            var deltaY = targetMouseY - mouseTrackingY;
+            
+            if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1) {
+                mouseTrackingX += deltaX * lerpFactor;
+                mouseTrackingY += deltaY * lerpFactor;
                 
-                var deltaX = targetMouseX - mouseTrackingX;
-                var deltaY = targetMouseY - mouseTrackingY;
-                
-                if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1) {
-                    mouseTrackingX += deltaX * lerpFactor;
-                    mouseTrackingY += deltaY * lerpFactor;
-                    
-                    if (!isDragging) {
-                        updateTransform();
-                    }
-                    
-                    mouseAnimationId = requestAnimationFrame(animateMouseTracking);
-                } else {
-                    mouseTrackingX = targetMouseX;
-                    mouseTrackingY = targetMouseY;
-                    if (!isDragging) {
-                        updateTransform();
-                    }
-                    mouseAnimationId = null;
-                }
-            }
-
-            function handleStart(clientX, clientY) {
-                isDragging = true;
-                startX = clientX - currentX;
-                startY = clientY - currentY;
-                panContainer.style.cursor = 'grabbing';
-                
-                // Disable CSS transition during panning
-                gridContainer.style.transition = 'none';
-                
-                // Stop any momentum when starting to drag
-                momentumX = 0;
-                momentumY = 0;
-                isDecelerating = false;
-                
-                // Stop mouse tracking animation during drag
-                if (mouseAnimationId) {
-                    cancelAnimationFrame(mouseAnimationId);
-                    mouseAnimationId = null;
-                }
-            }
-
-            function handleMove(clientX, clientY) {
-                if (!isDragging) return;
-                
-                var newX = clientX - startX;
-                var newY = clientY - startY;
-                
-                var constrained = applyConstraints(newX, newY);
-                currentX = constrained.x;
-                currentY = constrained.y;
-                
-                updateTransform();
-            }
-
-            function handleEnd() {
-                isDragging = false;
-                panContainer.style.cursor = 'grab';
-                
-                // Re-enable CSS transition after panning
-                setTimeout(function() {
-                    gridContainer.style.transition = 'transform 1.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                }, 100);
-            }
-
-            // Momentum animation function
-            function animateMomentum() {
-                if (!isDecelerating || (Math.abs(momentumX) < minMomentum && Math.abs(momentumY) < minMomentum)) {
-                    isDecelerating = false;
-                    return;
-                }
-
-                var constrained = applyConstraints(currentX + momentumX, currentY + momentumY);
-                currentX = constrained.x;
-                currentY = constrained.y;
-                
-                momentumX *= decelerationFactor;
-                momentumY *= decelerationFactor;
-                
-                updateTransform();
-                requestAnimationFrame(animateMomentum);
-            }
-
-            // Mouse tracking for subtle movement
-            document.addEventListener('mousemove', function(e) {
                 if (!isDragging) {
-                    // Calculate mouse position relative to viewport center
-                    var viewportCenterX = window.innerWidth / 2;
-                    var viewportCenterY = window.innerHeight / 2;
-                    
-                    // Calculate offset from center as percentage
-                    var offsetX = (e.clientX - viewportCenterX) / viewportCenterX;
-                    var offsetY = (e.clientY - viewportCenterY) / viewportCenterY;
-                    
-                    // Apply 2% movement
-                    var maxMovement = Math.min(window.innerWidth, window.innerHeight) * 0.02;
-                    targetMouseX = offsetX * maxMovement;
-                    targetMouseY = offsetY * maxMovement;
-                    
-                    // Start smooth animation if not already running
-                    if (!mouseAnimationId) {
-                        animateMouseTracking();
-                    }
-                } else {
-                    // During drag, handle drag movement
-                    handleMove(e.clientX, e.clientY);
+                    updateTransform();
                 }
-            });
+                
+                mouseAnimationId = requestAnimationFrame(animateMouseTracking);
+            } else {
+                mouseTrackingX = targetMouseX;
+                mouseTrackingY = targetMouseY;
+                if (!isDragging) {
+                    updateTransform();
+                }
+                mouseAnimationId = null;
+            }
+        }
 
-            // Handle mouse enter/leave for smoother transitions
-            document.addEventListener('mouseenter', function() {
-                mouseEnteredViewport = true;
-            });
+        function handleStart(clientX, clientY) {
+            isDragging = true;
+            startX = clientX - currentX;
+            startY = clientY - currentY;
+            panContainer.style.cursor = 'grabbing';
+            
+            // Disable CSS transition during panning
+            gridContainer.style.transition = 'none';
+            
+            // Stop any momentum when starting to drag
+            momentumX = 0;
+            momentumY = 0;
+            isDecelerating = false;
+            
+            // Stop mouse tracking animation during drag
+            if (mouseAnimationId) {
+                cancelAnimationFrame(mouseAnimationId);
+                mouseAnimationId = null;
+            }
+        }
 
-            document.addEventListener('mouseleave', function() {
-                mouseEnteredViewport = false;
-                // Gradually return to center when mouse leaves
-                targetMouseX = 0;
-                targetMouseY = 0;
-                if (!mouseAnimationId && !isDragging) {
+        function handleMove(clientX, clientY) {
+            if (!isDragging) return;
+            
+            var newX = clientX - startX;
+            var newY = clientY - startY;
+            
+            var constrained = applyConstraints(newX, newY);
+            currentX = constrained.x;
+            currentY = constrained.y;
+            
+            updateTransform();
+        }
+
+        function handleEnd() {
+            isDragging = false;
+            panContainer.style.cursor = 'grab';
+            
+            // Re-enable CSS transition after panning
+            setTimeout(function() {
+                gridContainer.style.transition = 'transform 1.5s cubic-bezier(0.25, 1, 0.5, 1)';
+            }, 100);
+        }
+
+        // Momentum animation function
+        function animateMomentum() {
+            if (!isDecelerating || (Math.abs(momentumX) < minMomentum && Math.abs(momentumY) < minMomentum)) {
+                isDecelerating = false;
+                return;
+            }
+
+            var constrained = applyConstraints(currentX + momentumX, currentY + momentumY);
+            currentX = constrained.x;
+            currentY = constrained.y;
+            
+            momentumX *= decelerationFactor;
+            momentumY *= decelerationFactor;
+            
+            updateTransform();
+            requestAnimationFrame(animateMomentum);
+        }
+
+        // Mouse tracking for subtle movement
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) {
+                // Calculate mouse position relative to viewport center
+                var viewportCenterX = window.innerWidth / 2;
+                var viewportCenterY = window.innerHeight / 2;
+                
+                // Calculate offset from center as percentage
+                var offsetX = (e.clientX - viewportCenterX) / viewportCenterX;
+                var offsetY = (e.clientY - viewportCenterY) / viewportCenterY;
+                
+                // Apply 2% movement
+                var maxMovement = Math.min(window.innerWidth, window.innerHeight) * 0.02;
+                targetMouseX = offsetX * maxMovement;
+                targetMouseY = offsetY * maxMovement;
+                
+                // Start smooth animation if not already running
+                if (!mouseAnimationId) {
                     animateMouseTracking();
                 }
-            });
+            } else {
+                // During drag, handle drag movement
+                handleMove(e.clientX, e.clientY);
+            }
+        });
 
-            // Trackpad/wheel event handling
-            panContainer.addEventListener('wheel', function(e) {
-                e.preventDefault();
-                
-                // Disable transition during wheel/trackpad panning
-                gridContainer.style.transition = 'none';
-                
-                // Stop any ongoing momentum
-                isDecelerating = false;
-                
-                // Determine if this is a trackpad (smoother, smaller values) or mouse wheel
-                var isTrackpad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) < 50;
-                var sensitivity = isTrackpad ? 1.0 : 0.5;
-                
-                // Apply movement with sensitivity
-                var deltaX = -e.deltaX * sensitivity;
-                var deltaY = -e.deltaY * sensitivity;
-                
-                var constrained = applyConstraints(currentX + deltaX, currentY + deltaY);
-                currentX = constrained.x;
-                currentY = constrained.y;
-                
-                // For trackpad, add momentum for smooth feel
-                if (isTrackpad) {
-                    momentumX = deltaX * 0.3;
-                    momentumY = deltaY * 0.3;
-                    
-                    // Start momentum animation after a short delay
-                    clearTimeout(window.momentumTimeout);
-                    window.momentumTimeout = setTimeout(function() {
-                        if (!isDragging && !isDecelerating) {
-                            isDecelerating = true;
-                            animateMomentum();
-                        }
-                    }, 50);
-                }
-                
-                updateTransform();
-            }, { passive: false });
+        // Handle mouse enter/leave for smoother transitions
+        document.addEventListener('mouseenter', function() {
+            mouseEnteredViewport = true;
+        });
 
-            // Mouse events
-            panContainer.addEventListener('mousedown', function(e) {
-                e.preventDefault();
-                handleStart(e.clientX, e.clientY);
-            }, { passive: false });
+        document.addEventListener('mouseleave', function() {
+            mouseEnteredViewport = false;
+            // Gradually return to center when mouse leaves
+            targetMouseX = 0;
+            targetMouseY = 0;
+            if (!mouseAnimationId && !isDragging) {
+                animateMouseTracking();
+            }
+        });
 
-            document.addEventListener('mouseup', handleEnd, { passive: false });
-
-            // Touch events
-            panContainer.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                var touch = e.touches[0];
-                handleStart(touch.clientX, touch.clientY);
-            });
-
-            document.addEventListener('touchmove', function(e) {
-                if (isDragging) {
-                    e.preventDefault();
-                    var touch = e.touches[0];
-                    handleMove(touch.clientX, touch.clientY);
-                }
-            });
-
-            document.addEventListener('touchend', handleEnd, { passive: false });
-
-            // Prevent grid item clicks from triggering drag
-            var gridItems = document.querySelectorAll('.grid-item');
-            for (var i = 0; i < gridItems.length; i++) {
-                gridItems[i].addEventListener('mousedown', function(e) {
-                    e.stopPropagation();
-                }, { passive: false });
+        // Trackpad/wheel event handling
+        panContainer.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            
+            // Disable transition during wheel/trackpad panning
+            gridContainer.style.transition = 'none';
+            
+            // Stop any ongoing momentum
+            isDecelerating = false;
+            
+            // Determine if this is a trackpad (smoother, smaller values) or mouse wheel
+            var isTrackpad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) < 50;
+            var sensitivity = isTrackpad ? 1.0 : 0.5;
+            
+            // Apply movement with sensitivity
+            var deltaX = -e.deltaX * sensitivity;
+            var deltaY = -e.deltaY * sensitivity;
+            
+            var constrained = applyConstraints(currentX + deltaX, currentY + deltaY);
+            currentX = constrained.x;
+            currentY = constrained.y;
+            
+            // For trackpad, add momentum for smooth feel
+            if (isTrackpad) {
+                momentumX = deltaX * 0.3;
+                momentumY = deltaY * 0.3;
+                
+                // Start momentum animation after a short delay
+                clearTimeout(window.momentumTimeout);
+                window.momentumTimeout = setTimeout(function() {
+                    if (!isDragging && !isDecelerating) {
+                        isDecelerating = true;
+                        animateMomentum();
+                    }
+                }, 50);
             }
             
-            // Initialize Gallery
-            console.log('Initializing Gallery...');
-            Gallery.init();
-        })();
+            updateTransform();
+        }, { passive: false });
+
+        // Mouse events
+        panContainer.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            handleStart(e.clientX, e.clientY);
+        }, { passive: false });
+
+        document.addEventListener('mouseup', handleEnd, { passive: false });
+
+        // Touch events for panning
+        panContainer.addEventListener('touchstart', function(e) {
+            // Only handle panning if it's not a grid item
+            if (e.target.classList.contains('grid-item')) return;
+            
+            e.preventDefault();
+            var touch = e.touches[0];
+            handleStart(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(e) {
+            if (isDragging) {
+                e.preventDefault();
+                var touch = e.touches[0];
+                handleMove(touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', function(e) {
+            if (isDragging) {
+                handleEnd();
+            }
+        }, { passive: false });
+        
+        // Initialize Gallery
+        console.log('Initializing Gallery...');
+        Gallery.init();
+    })();
     </script>
 </body>
 </html>
