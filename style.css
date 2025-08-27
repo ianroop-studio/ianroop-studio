@@ -305,7 +305,7 @@ p a:hover {
     .gallery-nav {
         padding: 10px 15px;
         font-size: 1.2em; 
-        top: 80%;
+        top: 84%;
         background-color: salmon;        
     }
     
@@ -329,11 +329,16 @@ p a:hover {
 	    transform: translateY(-50%);
         background-color: lavender;        
     }
+
+    .gallery-container {
+    	width: 100%;
+    }
     
     .gallery-close {
         font-size: 2em;
         top: 15px;
-        right: 20px;
+        right: 44px;
+        background-color: salmon;
     }
     
     .gallery-caption {
