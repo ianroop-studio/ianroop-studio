@@ -308,7 +308,18 @@ p a:hover {
         top: 80%;
         background-color: salmon;        
     }
-}   
+    
+    .gallery-close {
+        font-size: 2em;
+        top: 15px;
+        right: 20px;
+    }
+    
+    .gallery-caption {
+        font-size: 1em;
+        margin-top: 15px;
+        max-width: 80%;
+    }
 
 @media (orientation: landscape) and (max-width: 768px) {
   .gallery-nav {
@@ -318,6 +329,19 @@ p a:hover {
 	    transform: translateY(-50%);
         background-color: lavender;        
     }
+    
+    .gallery-close {
+        font-size: 2em;
+        top: 15px;
+        right: 20px;
+    }
+    
+    .gallery-caption {
+        font-size: 1em;
+        margin-top: 15px;
+        max-width: 80%;
+    }
+
 }
 
     /* Mobile optimizations - Phone */
@@ -327,5 +351,18 @@ p a:hover {
         font-size: 1.2em; 
         top: 80%;
         background-color: yellow;        
+    }
+    
+    .gallery-close {
+        font-size: 2em;
+        top: 15px;
+        right: 20px;
+    }
+    
+    .gallery-caption {
+        font-size: 1em;
+        margin-top: 15px;
+        max-width: 60%;
+        background-color: ivory;
     }
 }
