@@ -322,13 +322,38 @@ p a:hover {
 
 #info {
 	width: 50%;
+	max-width: 864px;
 	margin: 0 auto;
 	display: block;
 	background-color: #FFFFFF;
 }
 
+/* Mobile optimizations - Phone */
+@media screen and (max-width: 480px) {
+    
+    .gallery-nav {
+        padding: 10px 15px;
+        font-size: 1.2em; 
+        top: 80%;
+        background-color: yellow;        
+    }
+    
+    .gallery-close {
+        font-size: 2em;
+        top: 15px;
+        right: 20px;
+    }
+    
+    .gallery-caption {
+        font-size: 1em;
+        margin-top: 15px;
+        max-width: 60%;
+        background-color: ivory;
+    }
+}
+
 /* Mobile optimizations - Tablet */
-@media (orientation: portrait) and (max-width: 768px) {
+@media screen and (max-width: 768px) and (orientation: portrait) {
     
     .gallery-nav {
         padding: 10px 15px;
@@ -349,7 +374,12 @@ p a:hover {
         max-width: 80%;
     }
 
-@media (orientation: landscape) and (max-width: 768px) {
+    #info {
+    	width: 80%;        	
+    }
+
+
+@media screen and (max-width: 768px) and (orientation: landscape) {
   
   .gallery-nav {
         padding: 10px 15px;
@@ -370,35 +400,5 @@ p a:hover {
         font-size: 1em;
         margin-top: 15px;
         max-width: 80%;
-    }
-
-}
-
-    /* Mobile optimizations - Phone */
-@media (max-width: 480px) {
-    
-    .info {
-    	width: 90%;
-    	background-color: salmon !important;
-    }
-
-    .gallery-nav {
-        padding: 10px 15px;
-        font-size: 1.2em; 
-        top: 80%;
-        background-color: yellow;        
-    }
-    
-    .gallery-close {
-        font-size: 2em;
-        top: 15px;
-        right: 20px;
-    }
-    
-    .gallery-caption {
-        font-size: 1em;
-        margin-top: 15px;
-        max-width: 60%;
-        background-color: ivory;
     }
 }
