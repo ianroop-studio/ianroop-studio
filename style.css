@@ -171,11 +171,11 @@ p a:hover {
 }
 
 .gallery-image {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 90%; /* previous 100% */
+    max-height: 90%;
     object-fit: contain;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease; 
 }
 
 .gallery-image.loaded {
@@ -185,11 +185,14 @@ p a:hover {
 .gallery-caption {
     position: absolute;
     bottom: 0;
-    left: 50%;
+    left: 0;    
+    padding-left: 10%;
+    padding-top: 4px;
+    /*left: 50%;
     padding-left: 16px;
+    text-align: left;*/
     font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
     font-size: 1em;
-    color: #1A1A1A;
     text-align: left;    
     max-width: 80%;
     color: #1A1A1A;
@@ -199,8 +202,9 @@ p a:hover {
 .gallery-close {
     position: absolute;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 0;
+    /*left: 50%;
+    transform: translateX(-50%);*/
     font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
     font-size: 2.5em;
     color: #1A1A1A;
@@ -249,10 +253,14 @@ p a:hover {
 .gallery-counter {
     position: absolute;
     bottom: 0;
-    right: 50%;
-    padding-right: 16px;
+    right: 0;
     text-align: right;
-    /*transform: translateX(-50%);*/
+    padding-right: 10%;
+    margin-top: 4px;
+    /*right: 50%;
+    padding-right: 16px;
+    text-align: right;*/
+    /*transform: translateX(-50%); Center aligns horizontally*/
     font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
     font-size: 1em;
     color: #1A1A1A;
