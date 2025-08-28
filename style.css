@@ -370,7 +370,7 @@ p a:hover {
 
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait){
     
     .gallery-nav {        
         top: 84%;
@@ -410,7 +410,7 @@ p a:hover {
     	width: 80%;        	
     }
 
-@media (max-width: 480px) {
+/*@media (max-width: 480px) {
     
     .gallery-nav {        
         top: 80%;                
@@ -427,4 +427,4 @@ p a:hover {
     .gallery-container {    
 		padding: 60px 24px 60px 24px; /* Add padding instead of reducing width */
 	}
-}
+}*/
