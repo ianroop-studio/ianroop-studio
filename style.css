@@ -94,11 +94,8 @@ p a:hover {
 	opacity: 0.75;
 }
 
-em {
+.em {
 	font-family: 'FoundersGroteskRegularItalic', 'Helvetica', 'Arial', sans-serif;
-    font-size: 1.2em;
-    text-align: left;
-    color: #1A1A1A;
 }
 
 .caption {
@@ -384,9 +381,29 @@ em {
         font-size: 1.2em; 
     }
 
+    .gallery-caption {
+    	bottom: 20px;
+    }
+
+    .gallery-counter {
+    	bottom: 20px;
+    }
+
+    .gallery-close {
+    	top: 12px;
+    }
+
 	.gallery-container {    
-		padding: 44px 56px 44px 56px; /* Add padding instead of reducing width */
+		padding: 24px 32px 24px 32px; /* Add padding instead of reducing width */
 		background-color: salmon;
+    }
+
+    .gallery-name {
+		top: 12px;
+    }
+
+    #info {
+    	width: 80%;        	
     }
 }
 
