@@ -49,6 +49,7 @@
             <button class="gallery-nav gallery-next" id="galleryNext">Next</button>
             <div class="gallery-loading" id="galleryLoading"></div>
             <img class="gallery-image" id="galleryImage" alt="Gallery Image">
+            <div class="gallery-name" id="galleryName">Ian Roop Studio</div>
             <div class="gallery-caption" id="galleryCaption"></div>
             <div class="gallery-counter" id="galleryCounter">1 / 21</div>            
         </div>
@@ -121,7 +122,7 @@
                 this.overlay = document.getElementById('galleryOverlay');
                 this.image = document.getElementById('galleryImage');
                 this.loading = document.getElementById('galleryLoading');
-                this.counter = document.getElementById('galleryCounter');
+                this.counter = document.getElementById('galleryCounter');                
                 this.caption = document.getElementById('galleryCaption');
                 this.gridItems = Array.from(document.querySelectorAll('.grid-item'));
                 this.totalItems = this.gridItems.length;
