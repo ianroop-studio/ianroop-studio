@@ -268,11 +268,11 @@ p a:hover {
 }
 
 .gallery-prev {
-    left: 30px;
+    left: 40px;
 }
 
 .gallery-next {
-    right: 30px;
+    right: 40px;
 }
 
 .gallery-counter {
@@ -328,15 +328,66 @@ p a:hover {
 	background-color: #FFFFFF;
 }
 
-/* Mobile optimizations - Phone */
-@media screen and (max-width: 480px) {
+
+
+/* Mobile optimizations */
+
+@media (max-width: 960px) and (orientation: landscape) {
+	.gallery-container {    
+		padding: 40px 60px 40px 60px; /* Add padding instead of reducing width */
+	}   
+}
+
+
+@media (max-width: 768px) and (orientation: portrait) {
+    
+    .gallery-nav {
+        padding: 10px 15px;
+        font-size: 1.2em; 
+        top: 84%;
+        background-color: salmon;        
+    }   
+    
+    .gallery-close {
+        font-size: 2em;
+        top: 15px;
+        right: 20px;
+    }
+    
+    .gallery-caption {
+        font-size: 1em;
+        margin-top: 15px;
+        max-width: 60%;
+    }
+
+    .gallery-container {    
+		padding: 60px 40px 60px 40px; /* Add padding instead of reducing width */
+	}
+
+    #info {
+    	width: 80%;        	
+    }
+
+
+@media (max-width: 768px) and (orientation: landscape) {
+  
+  .gallery-nav {
+        padding: 10px 15px;
+        font-size: 1.2em; 
+        top: 50%;
+	    transform: translateY(-50%);
+        background-color: lavender;        
+    }
+}
+
+@media (max-width: 480px) {
     
     .gallery-nav {
         padding: 10px 15px;
         font-size: 1.2em; 
         top: 80%;
         background-color: yellow;        
-    }
+    }  
     
     .gallery-close {
         font-size: 2em;
@@ -350,55 +401,8 @@ p a:hover {
         max-width: 60%;
         background-color: ivory;
     }
-}
 
-/* Mobile optimizations - Tablet */
-@media screen and (max-width: 768px) and (orientation: portrait) {
-    
-    .gallery-nav {
-        padding: 10px 15px;
-        font-size: 1.2em; 
-        top: 84%;
-        background-color: salmon;        
-    }
-    
-    .gallery-close {
-        font-size: 2em;
-        top: 15px;
-        right: 20px;
-    }
-    
-    .gallery-caption {
-        font-size: 1em;
-        margin-top: 15px;
-        max-width: 80%;
-    }
-
-    #info {
-    	width: 80%;        	
-    }
-
-
-@media screen and (max-width: 768px) and (orientation: landscape) {
-  
-  .gallery-nav {
-        padding: 10px 15px;
-        font-size: 1.2em; 
-        top: 50%;
-	    transform: translateY(-50%);
-        background-color: lavender;        
-    }
-    
-    .gallery-close {
-        font-size: 2em;
-        top: 15px;
-        right: 20px;
-        background-color: salmon;
-    }
-    
-    .gallery-caption {
-        font-size: 1em;
-        margin-top: 15px;
-        max-width: 80%;
-    }
+    .gallery-container {    
+		padding: 60px 24px 60px 24px; /* Add padding instead of reducing width */
+	}
 }
