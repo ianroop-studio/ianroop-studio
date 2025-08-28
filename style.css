@@ -323,7 +323,7 @@ p a:hover {
 
 /* Mobile optimizations */
 
-@media (max-width: 1440px) {
+@media screen and (max-width: 1440px) {
 	.gallery-nav {
 		top: 50%;
 	}
@@ -333,17 +333,17 @@ p a:hover {
 	}  
 }
 
-@media (max-width: 1280px) {
+@media screen and (max-width: 1280px) {
 	.gallery-nav {
 		top: 50%;
 	}
 
-	/*.gallery-container {    
+	.gallery-container {    
 		padding: 60px 120px 60px 120px; /* Add padding instead of reducing width */
-	}*/
+	}
 }
 
-@media (max-width: 960px) {
+@media screen and (max-width: 960px) {
 	
 	.gallery-nav {        
         top: 84%;        
@@ -362,15 +362,20 @@ p a:hover {
 	}
 }
 
-@media (max-width: 768px) and (orientation: landscape) {
+@media screen and (max-width: 768px) and (orientation: landscape) {
+	
 	.gallery-nav {        
         top: 50%;
-        font-size: 1.2em;               
+        font-size: 1.2em; 
     }
 
+	.gallery-container {    
+		padding: 44px 56px 44px 56px; /* Add padding instead of reducing width */
+		background-color: salmon;
+    }
 }
 
-@media (max-width: 768px) and (orientation: portrait){
+@media screen and (max-width: 768px) and (orientation: portrait) {
     
     .gallery-nav {        
         top: 84%;
@@ -410,7 +415,7 @@ p a:hover {
     	width: 80%;        	
     }
 
-/*@media (max-width: 480px) {
+/* @media screen and (max-width: 480px) {
     
     .gallery-nav {        
         top: 80%;                
@@ -425,6 +430,6 @@ p a:hover {
     }
 
     .gallery-container {    
-		padding: 60px 24px 60px 24px; /* Add padding instead of reducing width */
+		padding: 60px 24px 60px 24px; Add padding instead of reducing width 
 	}
 }*/
