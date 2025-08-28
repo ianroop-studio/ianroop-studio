@@ -263,12 +263,13 @@ p a:hover {
     font-size: 1.4em;
     color: #1A1A1A;
     cursor: pointer;
-    background: rgba(255, 255, 255, 1);
+    /*background: rgba(255, 255, 255, 1);*/
+    background: none;
     border: none;
     padding: 15px 20px;
     user-select: none;
     z-index: 2001;
-    transition: opacity 0.2s ease, background-color 0.2s ease;
+    /*transition: opacity 0.2s ease, background-color 0.2s ease;*/
     /* Mobile touch targets */
     min-width: 44px;
     min-height: 44px;
@@ -343,14 +344,14 @@ p a:hover {
 
 /* Mobile optimizations */
 
-@media (max-width: 960px) and (orientation: landscape) {
+@media (max-width: 960px) {
 	.gallery-container {    
 		padding: 40px 60px 40px 60px; /* Add padding instead of reducing width */
 	}   
 }
 
 
-@media (max-width: 768px) and (orientation: portrait) {
+@media (max-width: 720px) {
     
     .gallery-nav {
         padding: 10px 15px;
@@ -380,7 +381,7 @@ p a:hover {
     }
 
 
-@media (max-width: 768px) and (orientation: landscape) {
+/*@media (max-width: 768px) and (orientation: landscape) {
   
   .gallery-nav {
         padding: 10px 15px;
@@ -389,7 +390,7 @@ p a:hover {
 	    transform: translateY(-50%);
         background-color: lavender;        
     }
-}
+}*/
 
 @media (max-width: 480px) {
     
