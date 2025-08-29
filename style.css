@@ -96,10 +96,11 @@ p a:hover {
 	font-family: 'FoundersGroteskRegularItalic', 'Helvetica', 'Arial', sans-serif;
 }
 
-.caption {
+.copyright {
 	font-family: 'FoundersGroteskRegular', 'Helvetica', 'Arial', sans-serif;
     font-size: 1em;
     text-align: left;
+    margin-top: 48px;
     color: #1A1A1A;
 }
 
