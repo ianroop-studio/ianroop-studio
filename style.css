@@ -41,8 +41,7 @@ body {
 ul {
     list-style-type: none;
     display: flex;
-    justify-content: center;
-    
+    justify-content: center;    
 }
 
 ul a {
@@ -64,7 +63,6 @@ ul a::after {
     background-color: #1A1A1A; /* Color of the border */
     transition: width 0.3s ease-out; /* Animation for width */
 }
-
 
 ul a:hover::after {
 	width: 80%; /* Expand to full width on hover */
@@ -320,7 +318,7 @@ p a:hover {
 	margin: 0 auto;
 	display: flex;
 	align-content: center;
-	padding: 12em 0 4em 0;
+	padding: 96px 0 64px 0;
 	background-color: #FFFFFF;
 	overflow-y: scroll;
 }
@@ -336,6 +334,7 @@ p a:hover {
 /* Mobile optimizations */
 
 @media screen and (max-width: 1440px) {
+	
 	.gallery-nav {
 		top: 50%;
 	}
@@ -346,6 +345,7 @@ p a:hover {
 }
 
 @media screen and (max-width: 1280px) {
+	
 	.gallery-nav {
 		top: 50%;
 	}
@@ -355,23 +355,67 @@ p a:hover {
 	}
 }
 
-@media screen and (max-width: 960px) {
+@media screen and (max-width: 960px) and (orientation: landscape) {
 	
 	.gallery-nav {        
-        top: 84%;        
+        top: 50%;        
     } 
 
-	.gallery-container {    
-		padding: 60px 60px 60px 60px; /* Add padding instead of reducing width */
-	}   
-	
-	.gallery-prev {
+    .gallery-prev {
 	    left: 48px;
 	}
 
 	.gallery-next {
 	    right: 48px;
 	}
+
+    .gallery-caption {
+    	bottom: 20px;
+    }
+
+    .gallery-counter {
+    	bottom: 20px;
+    }
+
+	.gallery-container {    
+		padding: 24px 32px 24px 32px; /* Add padding instead of reducing width */
+		background-color: lightskyblue;
+	}   	
+
+	.gallery-close {
+    	top: 12px;
+    }
+
+    .gallery-name {
+		top: 16px;
+    }
+
+	#info {
+    	width: 80%;        	
+    }
+}
+
+@media screen and (max-width: 960px) and (orientation: portrait) {
+	
+	.gallery-nav {        
+        top: 84%;        
+    } 
+
+    .gallery-prev {
+	    left: 48px;
+	}
+
+	.gallery-next {
+	    right: 48px;
+	}
+
+	.gallery-container {    
+		padding: 60px 60px 60px 60px; /* Add padding instead of reducing width */
+	}   		
+
+	#info {
+    	width: 80%;        	
+    }
 }
 
 @media screen and (max-width: 768px) and (orientation: landscape) {
@@ -380,6 +424,14 @@ p a:hover {
         top: 50%;
         font-size: 1.2em; 
     }
+
+    .gallery-prev {
+	    left: 24px;
+	}
+
+	.gallery-next {
+	    right: 24px;	   
+	} 
 
     .gallery-caption {
     	bottom: 20px;
@@ -393,14 +445,14 @@ p a:hover {
     	top: 12px;
     }
 
+    .gallery-name {
+		top: 16px;
+    }
+
 	.gallery-container {    
 		padding: 24px 32px 24px 32px; /* Add padding instead of reducing width */
 		background-color: salmon;
-    }
-
-    .gallery-name {
-		top: 12px;
-    }
+    }    
 
     #info {
     	width: 80%;        	
@@ -446,6 +498,47 @@ p a:hover {
     #info {
     	width: 80%;        	
     }
+}
+
+@media screen and (max-width: 768px) {
+
+	/* Mobile: Convert to normal scrollable container */
+    
+    .pan-container-js {
+        position: fixed;
+        top: 0;
+        left:0;
+        right: 0;
+        display: block;
+        cursor: default;
+        user-select: auto;
+        padding: 20px 0;
+        min-height: calc(100vh - 80px);
+        overflow-y: scroll;
+    }
+    
+    .pan-container-js:active {
+        cursor: default;
+    }
+
+    .grid-item {
+        width: 100%;
+        height: 200px; /* Fixed height for better mobile experience */
+        padding-bottom: 0; /* Remove aspect ratio padding */
+        margin-bottom: 48px;
+        position: static; /* Remove positioning */
+        max-width: none; /* Remove max-width constraint */      
+    }
+    
+    .grid-item:hover {
+        transform: none; /* Disable hover scale on mobile */
+    }
+
+    .grid-container {
+    	display: block;
+    	margin-top: 96px;    
+    }
+}
 
 @media screen and (max-width: 480px) {
     
@@ -454,7 +547,7 @@ p a:hover {
     }  
 
     .gallery-close {        
-        right: 20px;
+        right: 16px;
     }
     
     .gallery-caption {        
@@ -464,5 +557,9 @@ p a:hover {
     .gallery-container {    
 		padding: 60px 24px 60px 24px; /* Add padding instead of reducing width */
 		background-color: ivory;
+	}
+
+	.gallery-name {
+		left: 20px;
 	}
 }
