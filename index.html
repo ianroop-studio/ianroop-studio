@@ -449,7 +449,7 @@
 
         // Smooth mouse tracking animation
         function animateMouseTracking() {
-            var lerpFactor = 0.08;
+            var lerpFactor = 0.125; // Adjust for smoothness (0.02 = very smooth, 0.2 = snappy)
             
             var deltaX = targetMouseX - mouseTrackingX;
             var deltaY = targetMouseY - mouseTrackingY;
