@@ -11,7 +11,7 @@
 
 @font-face {
     font-family: 'FoundersGroteskRegularItalic';
-    src: URL('./fonts/test-founders-grotesk-regular-italic.woff2');
+    src: URL('./fonts/founders-grotesk-regular-italic.woff2');
 }
 
 body, html, div, ul, li, h1, h2, h3, h4, h5, h6 {
