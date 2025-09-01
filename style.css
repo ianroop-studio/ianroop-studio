@@ -563,4 +563,8 @@ p a:hover {
 	.gallery-name {
 		left: 20px;
 	}
+
+	#info {
+		width: 80%;
+	}
 }
